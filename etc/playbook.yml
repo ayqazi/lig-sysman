@@ -5,7 +5,7 @@
     - file: state=absent path=/etc/localtime
     - file: state=link src=/usr/share/zoneinfo/GB-Eire dest=/etc/localtime force=yes
 
-    - user: name=lig state=present append=true groups=www-data generate_ssk_key=yes
+    - user: name=lig state=present append=true groups=www-data generate_ssh_key=yes
 
     - command: add-apt-repository -y '{{ item }}'
       with_items:
