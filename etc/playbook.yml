@@ -1,0 +1,40 @@
+---
+- hosts: localhost
+  tasks:
+
+    - file: state=absent path=/etc/localtime
+    - file: state=link src=/usr/share/zoneinfo/GB-Eire dest=/etc/localtime force=yes
+
+    - user: name=lig state=present append=true groups=www-data generate_ssk_key=yes
+
+    - command: add-apt-repository -y '{{ item }}'
+      with_items:
+        - ppa:rquillo/ansible
+
+    - apt: update_cache=yes upgrade=dist
+
+    - apt: pkg={{ item }} state=latest
+      with_items:
+        - aptitude
+        - screen
+        - emacs24-nox
+        - emacs24-el
+        - emacs-goodies-el
+        - openssh-client
+        - openssh-server
+        - openssh-blacklist-extra
+        - git
+        - zip
+        - unzip
+        - nullmailer
+      tags: [nullmailer]
+
+    - copy: src={{ dir }}/etc/nullmailer/remotes dest=/etc/nullmailer/remotes owner=mail group=mail mode=600
+      tags: [nullmailer]
+    - copy: src={{ dir }}/etc/nullmailer/adminaddr dest=/etc/nullmailer/adminaddr owner=root group=root mode=644
+      tags: [nullmailer]
+    - service: name=nullmailer state=restarted
+      tags: [nullmailer]
+
+    - copy: src={{ dir }}/etc/cron.d/lig mode=0744 dest=/etc/cron.d
+      tags: [batch]
